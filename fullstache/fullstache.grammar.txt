@@ -1,0 +1,63 @@
+?start : expr*
+
+?expr : "{" "{" "?" boolean "}" "}" expr*  ["{" "{" ":" "else" "}" "}" expr*] "{""{" "/" "?" "}""}" -> ifelse
+     | "{" "{" boolean "?" identifier ":" identifier "}""}" -> ifelse
+     | "{" "{" "#" VARIABLE "}" "}" expr* "{""{" "/" "#" "}""}" -> iterator
+     | "{" "{" VARIABLE "}" "}"
+     | JUNK
+
+?identifier : VARIABLE
+            | string
+            | NUMBER
+
+scoped : VARIABLE
+
+
+?boolean : boolean_atom
+         | boolean_atom "&&" boolean_atom ->bool_and
+         | boolean_atom "||" boolean_atom  ->bool_or
+         | boolean_atom "==" boolean_atom   ->bool_equal
+         | boolean_atom "!=" boolean_atom   ->nequal
+
+
+?boolean_atom : "!" boolean             -> bool_neg    
+              | "(" boolean ")"
+              | sum ">" sum -> arith_big
+              | sum "<" sum -> arith_less
+              | sum ">=" sum -> arith_beq
+              | sum "<=" sum -> arith_leq
+              | sum "==" sum -> equal
+              | sum "!=" sum -> nequal
+              | sum
+
+
+?sum : product
+     | sum "+" product   -> arith_add
+     | sum "-" product   -> arith_sub
+
+?product: atom
+     | product "*" atom  -> arith_mul
+     | product "/" atom  -> arith_div
+
+?atom: NUMBER          
+     | "-" atom         -> artih_neg
+     | "(" sum ")" 
+     | VARIABLE      
+
+
+?string : ESCAPED_STRING
+
+AND : "&&"
+OR : "||"
+
+JUNK : /~\(~[\S\s]+?~\)~/ 
+VARIABLE : /[a-zA-Z_$][a-zA-Z_\.0-9]*/
+BOOL_VARIABLE: /[a-zA-Z_$][a-zA-Z_\.0-9]*/
+NUM_VARIABLE: /[a-zA-Z_$][a-zA-Z_\.0-9]*/
+
+%import common.ESCAPED_STRING
+%import common.NUMBER
+%import common.WS
+%ignore WS
+
+

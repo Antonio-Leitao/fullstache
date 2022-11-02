@@ -1,0 +1,12 @@
+{
+  "name": {
+    "first": "MIKE",
+    "last": "SHINODA"
+  },
+  "exists": "True",
+  "persons": [{ "age": 12 }, { "age": 44 }],
+  "money": 32,
+  "bool":{
+    "variable":"True"
+  }
+}

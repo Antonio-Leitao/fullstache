@@ -1,0 +1,1 @@
+{{?exists&& !(!exists) }}~(~first name:~)~{{name.first}}~(~ ~)~{{:else}}~(~last name:~)~{{name.last}}{{/?}}
