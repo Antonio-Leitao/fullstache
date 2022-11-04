@@ -1,22 +1,20 @@
-import unittest
-from fullstache import Fullstache
+# content of test_verbosity_example.py
+def test_ok():
+    pass
 
 
-class TestStringMethods(unittest.TestCase):
-    def test_upper(self):
-        self.assertEqual("foo".upper(), "FOO")
-
-    def test_isupper(self):
-        self.assertTrue("FOO".isupper())
-        self.assertFalse("Foo".isupper())
-
-    def test_split(self):
-        s = "hello world"
-        self.assertEqual(s.split(), ["hello", "world"])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
+def test_words_fail():
+    fruits1 = ["banana", "apple", "grapes", "melon", "kiwi"]
+    fruits2 = ["banana", "apple", "orange", "melon", "kiwi"]
+    assert fruits1 == fruits2
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_numbers_fail():
+    number_to_text1 = {str(x): x for x in range(5)}
+    number_to_text2 = {str(x * 10): x * 10 for x in range(5)}
+    assert number_to_text1 == number_to_text2
+
+
+def test_long_text_fail():
+    long_text = "Lorem ipsum dolor sit amet " * 10
+    assert "hello world" in long_text
