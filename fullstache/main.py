@@ -1,3 +1,10 @@
+"""main module for fullstache module
+
+functions here should really just take care of files and directory handling everything else should be on compile
+
+"""
+
+
 import os
 import argparse
 from compiler import Fullstache

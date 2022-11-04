@@ -3,6 +3,7 @@
 ?expr : "{" "{" "?" boolean "}" "}" expr*  ["{" "{" ":" "else" "}" "}" expr*] "{""{" "/" "?" "}""}" -> ifelse
      | "{" "{" boolean "?" identifier ":" identifier "}""}" -> ifelse
      | "{" "{" "#" VARIABLE "}" "}" expr* "{""{" "/" "#" "}""}" -> iterator
+     | "{" "{" "#" VARIABLE "as" VARIABLE ["," VARIABLE] "}" "}" expr* "{""{" "/" "#" "}""}" -> enumerator
      | "{" "{" VARIABLE "}" "}"
      | JUNK
 

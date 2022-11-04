@@ -3,24 +3,25 @@ from lark import Lark
 import json
 
 
-def wrapInverse(pattern, doc, lwrap="~(~", rwrap="~)~"):
+def wrapInverse(doc, lwrap="~(~", rwrap="~)~"):
     start = 0
+    pattern = "\{\{([\S\s]*?)\}\}"
     s = ""
     for match in re.finditer(pattern, doc):
         if match.start() != start:
             s += lwrap + doc[start : match.start()] + rwrap
         s += match.group()
         start = match.end()
+    print("WRAP",len(s))
     return s
 
 
 # LOAD GRAMMAR FROM FILE
-def loadParser(grammar_file="fullstache.grammar.txt", transformer=None):
-
+def loadParser(grammar_file="fullstache/fullstache.grammar.txt"):
     with open(grammar_file, "r") as f:
         grammar = f.read()
     # parse grammar
-    parser = Lark(grammar, parser="lalr", transformer=transformer)
+    parser = Lark(grammar)
     return parser
 
 
@@ -29,8 +30,7 @@ def loadTemplate(file_dir="template.txt"):
     with open(file_dir, "r") as f:
         template = f.read()
 
-    pattern = "\{\{([\S\s]*?)\}\}"
-    template = wrapInverse(pattern, template)
+    template = wrapInverse(template)
     return template
 
 

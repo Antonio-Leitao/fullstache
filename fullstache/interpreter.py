@@ -1,13 +1,16 @@
-from lark import Transformer
 from lark.visitors import Interpreter, Visitor_Recursive
+from parser import buildParser
 from functools import reduce  # forward compatibility for Python 3
 from operator import getitem
-from lark import Lark, Tree
-from loaders import loadParser
+import re
 
 
 def getFromDict(dataDict, mapList):
     return reduce(getitem, mapList, dataDict)
+
+
+class FullstacheError(Exception):
+    pass
 
 
 class Variable:
@@ -77,108 +80,54 @@ class Variable:
     __nonzero__ = __bool__  # just to make sure it works on python <2
 
 
-class FullstacheError(Exception):
-    pass
-
-
-class Fullstache(Transformer):
+class FullstacheCompiler(Interpreter):
     def __init__(self, user_data):
         self.data = user_data
 
-    def JUNK(self, child):
-        return child[3:-3]
+    def enumerator(self, tree):
+        a, b, c = tree.children[:3]
+        d = tree.children[3:]
+        # var = getFromDict(self.data,tree.children[0].split("."))
+        print(f"A:{a}\n")
+        print(f"B:{b}\n")
+        print(f"C:{c}\n")
+        print(f"D:{d}\n")
+        self.visit_children(tree)
+        return
 
-    def VARIABLE(self, child):
-        try:
-            var = getFromDict(self.data, child.split("."))
-            var = Variable(value=var, template=child, exists=True)
-        except KeyError:
-            var = Variable(value=None, template=child, exists=False)
-        return var
-
-    def NUMBER(self, child):
-        return float(child)
-
-    def start(self, children):
-        flat = [item for child in children for item in child]
-        return "".join(flat)
-
-    def bool_neg(self, child):
-        return not child[0]
-
-    def bool_and(self, children):
-        a, b = children
-        return a and b
-
-    def bool_or(self, children):
-        a, b = children
-        return a or b
-
-    def equal(self, children):
-        a, b = children
-        return a == b
-
-    def nequal(self, children):
-        a, b = children
-        return a != b
-
-    def arith_big(self, children):
-        a, b = children
-        return float(a) > float(b)
-
-    def arith_less(self, children):
-        a, b = children
-        return float(a) < float(b)
-
-    def arith_beq(self, children):
-        a, b = children
-        return float(a) >= float(b)
-
-    def arith_leq(self, children):
-        a, b = children
-        return float(a) <= float(b)
-
-    def arith_add(self, children):
-        a, b = children
-        return float(a) + float(b)
-
-    def arith_sub(self, children):
-        a, b = children
-        return float(a) - float(b)
-
-    def arith_mul(self, children):
-        a, b = children
-        return float(a) * float(b)
-
-    def arith_div(self, children):
-        a, b = children
-        return float(a) / float(b)
-
-    def arith_neg(self, child):
-        return not child
-
-    def ifelse(self, children):
-        if children[0]:
-            return children[1]
-        elif len(children) > 2:
-            return children[2]
-        return ""
-
-    def iterator(self, children):
-        n = len(children[0])
-        return children[1:] * n
+    def VARIABLE(self, tree):
+        print("SUB:", tree)
 
 
-class Compiler(Interpreter):
-    def enumerator(self, nodes):
-        print("ENUM:", nodes)
-        return nodes
+# the standalone version of this. the main should simply call this dude multiple times
+# while starting it only once
+class Fullstache:
+    def __init__(self, grammar=None):
+        ###start parser and read grammar
+        self.grammar = grammar
+        self.parser = buildParser()
 
+    def interpret(self, text, user_data):
+        wrapped_text = self._wrapInverse(text)
+        if self.skip:
+            return text
+        tree = self.parser.parse(wrapped_text)
+        result = FullstacheCompiler(user_data).visit(tree)
+        return result
 
-def collapse(text, data):
-    parser = loadParser()
-    tree = parser.parse(text)
-    # t = Tree("a", [Tree("b", []), Tree("c", []), "d"])
+    def scan(self, doc):
+        pass
 
-    print(list(Compiler().visit_topdown(tree)))
-    pass
+    def _wrapInverse(self, doc, lwrap="~(~", rwrap="~)~"):
+        self.skip = False
+        start = 0
+        pattern = "\{\{([\S\s]*?)\}\}"
+        s = ""
+        for match in re.finditer(pattern, doc):
+            if match.start() != start:
+                s += lwrap + doc[start : match.start()] + rwrap
+            s += match.group()
+            start = match.end()
+        if len(s) == 0:
+            self.skip = True
+        return s
