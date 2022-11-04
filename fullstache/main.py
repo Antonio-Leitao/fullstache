@@ -17,7 +17,7 @@ class Fullstache:
         tree = self.parser.parse(doc)
         if tree is None:
             return doc
-        result = self.compiler.compile(tree, data)
+        result = self.compiler.compile(tree)
         return result
 
     def scan(self, dir):
