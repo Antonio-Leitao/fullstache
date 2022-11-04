@@ -1,25 +1,22 @@
-from lark import Transformer, Tree
-from lark.visitors import Interpreter, merge_transformers
-
-data = {"persons": [{"name": "MIKE", "age": 20}, {"name": "SHINODA", "age": 30}]}
+import unittest
+from fullstache import Fullstache
 
 
-class TBase(Transformer):
-    def start(self, children):
-        print(children)
-        return children[0] + "bar"
+class TestStringMethods(unittest.TestCase):
+    def test_upper(self):
+        self.assertEqual("foo".upper(), "FOO")
+
+    def test_isupper(self):
+        self.assertTrue("FOO".isupper())
+        self.assertFalse("Foo".isupper())
+
+    def test_split(self):
+        s = "hello world"
+        self.assertEqual(s.split(), ["hello", "world"])
+        # check that s.split fails when the separator is not a string
+        with self.assertRaises(TypeError):
+            s.split(2)
 
 
-class TImportedGrammar(Interpreter):
-    def enum(self, children):
-        print(children)
-        return "foo"
-
-
-composed_transformer = merge_transformers(TBase(), imported=TImportedGrammar())
-
-t = Tree("start", [Tree("imported__enum", 
-[Tree("variable",["persons"])])])
-
-assert composed_transformer.transform(t) == "foobar"
-print(composed_transformer.transform(t))
+if __name__ == "__main__":
+    unittest.main()
