@@ -18,7 +18,3 @@ class Compiler:
         for child in tree.children:
             self.compilation.append(self.interpret(child))
         return self.compilation
-
-
-comp = Compiler(data)
-comp.interpret("foo")

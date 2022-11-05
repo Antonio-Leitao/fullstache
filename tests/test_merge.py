@@ -1,4 +1,9 @@
-# content of test_verbosity_example.py
+import sys
+
+sys.path.append(".")
+from fullstache import Fullstache
+
+
 def test_ok():
     pass
 

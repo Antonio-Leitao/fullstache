@@ -4,8 +4,8 @@ ACCEPTS: parser and compiler
 SPITS: fullstache class 
 """
 
-from parser import Parser
-from compiler import Compiler
+from .parser import Parser
+from .compiler import Compiler
 
 
 class Fullstache:

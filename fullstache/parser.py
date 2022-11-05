@@ -21,8 +21,6 @@ JUNK : /~\(~[\S\s]+?~\)~/
 %ignore WS
 """
 
-
-
 class Parser:
     def __init__(self):
         self.parser = Lark(grammar)
